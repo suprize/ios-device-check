@@ -49,15 +49,17 @@ export async function QueryDevice(host: string, jwt: string, payload: QueryDevic
     if (response.status !== 200) {
         throw new Error(`Device check api returned ${response.status}: ${await response.text()}`);
     }
+    try {
+        const responseBody = await response.json();
+        if (!isQueryDeviceResult(responseBody)) {
+            throw new Error('Failed to parse response from device check api');
+        }
+        return responseBody;
 
-    const responseBody = await response.json();
-
-    if (!isQueryDeviceResult(responseBody)) {
-        throw new Error('Failed to parse response from device check api');
+    } catch (e) {
+        throw new Error(`Failed to parse Device check api response: ${await response.text()}`);
     }
-
-    return responseBody;
-} 
+}
 
 export interface UpdateDevicePayload extends QueryDevicePayload {
     bit0: boolean;
