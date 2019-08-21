@@ -51,7 +51,15 @@ export async function QueryDevice(host: string, jwt: string, payload: QueryDevic
     }
 
     const responseText = await response.text();
-    
+    if (responseText === 'Failed to find bit state') {
+        // Record doesn't exists in Apple servers
+        return {
+            bit0: false,
+            bit1: false,
+            last_update_time: ''
+        };
+    }
+
     try {
         const responseBody = JSON.parse(responseText);
         if (!isQueryDeviceResult(responseBody)) {
